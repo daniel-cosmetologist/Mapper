@@ -108,11 +108,20 @@ def generate_style_data_conditional(df, thresholds):
             'backgroundColor': '#ffcccb',
             'color': 'black'
         })
+        # Пустой
+        styles.append({
+            'if': {
+                'filter_query': f'{{{column}}} is blank',
+                'column_id': column
+            },
+            'backgroundColor': '#ffffff',
+            'color': 'black'
+        })
     return styles
 
 thresholds = {
-    'возраст': {'low': 18, 'high': 65},
-    'пол': {'low': 0, 'high': 1},  # Обычно пол не проверяется на "норму", но для примера: 0 для женщин, 1 для мужчин
+    # 'возраст': {'low': 18, 'high': 65},
+    # 'пол': {'low': 0, 'high': 1}, # 0 для женщин, 1 для мужчин
     'масса_тела': {'low': 50, 'high': 90},
     'рост': {'low': 150, 'high': 200},
     'от': {'low': 70, 'high': 99},  # Охват талии
@@ -197,10 +206,10 @@ thresholds = {
     'хром_cr': {'low': 35, 'high': 50},
     'цинк_zn': {'low': 11, 'high': 13},
     # Специфические для некоторых профессий и спорта
-    'профессия_работники_преимущественно_умственного_труда': {'low': 0, 'high': 1},  # Бинарные переменные, для примера
-    'профессия_работники_занятые_легким_физическим_трудом': {'low': 0, 'high': 1},
-    'спорт_легкий_спорт': {'low': 0, 'high': 1},
-    'спорт_не_занимаюсь': {'low': 0, 'high': 1},
+    # 'профессия_работники_преимущественно_умственного_труда': {'low': 0, 'high': 1},  # Бинарные переменные, для примера
+    # 'профессия_работники_занятые_легким_физическим_трудом': {'low': 0, 'high': 1},
+    # 'спорт_легкий_спорт': {'low': 0, 'high': 1},
+    # 'спорт_не_занимаюсь': {'low': 0, 'high': 1},
     'bmi': {'low': 18.5, 'high': 24.9},  # Индекс массы тела
 }
 
@@ -210,12 +219,15 @@ conditional_styles = generate_style_data_conditional(original_dataset, threshold
 
 
 app = Dash(__name__)
+server = app.server
 app.layout = html.Div([
     cyto.Cytoscape(
         id='cytoscape-graph',
         elements=elements,
         stylesheet=stylesheet,
         layout={'name': 'cose'},
+        # Expected one of ["random","preset","circle","concentric","grid",
+        # "breadthfirst","cose","cose-bilkent","fcose","cola","euler","spread","dagre","klay"].
         style={'width': '100%', 'height': '900px'},
         boxSelectionEnabled=True
     ),
@@ -244,11 +256,12 @@ def update_output(data):
         return dash_table.DataTable(
             data=selected_rows.to_dict('records'),
             columns=[{"name": i, "id": i} for i in selected_rows.columns],
-            page_size=10,  # Pagination
-            style_table={'height': '400px', 'overflowY': 'auto'},
+            page_size=100,  # Pagination
+            style_table={'height': '1000px', 'overflowY': 'auto'},
             fixed_rows={'headers': True, 'data': 0},
+            # fixed_columns={'headers': True, 'data': 1},
             style_data_conditional=conditional_styles,  # Условные стили, сгенерированные функцией
         )
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=8050)
+    app.run_server(debug=False, port=8050)
