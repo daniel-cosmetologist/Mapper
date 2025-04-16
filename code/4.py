@@ -470,4 +470,4 @@ def update_columns(n_clicks):
 
 # ------------------- Запуск -------------------
 if __name__ == '__main__':
-    app.run_server(debug=False, port=8061)
+    app.run_server(debug=False, host='0.0.0.0', port=8061)

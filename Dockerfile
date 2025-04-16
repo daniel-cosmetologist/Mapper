@@ -15,9 +15,15 @@ COPY requirements.txt /app/requirements.txt
 
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
+    
+RUN mkdir -p /app/code \
+    mkdir -p /app/datasets
 
-COPY . /app
+COPY /code/4.py /app/code
+COPY /datasets/db_nl_preprocessed-edit.csv /app/datasets
 
 EXPOSE 8061
+
+WORKDIR /app/code
 
 CMD ["python", "4.py"]
